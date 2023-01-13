@@ -17,6 +17,9 @@ gamma_memory = []
 win_memory = []
 mem_memory = []
 
+random_methods = ['RANDOM', 'LEAST_CHOSEN', 'UPPER_CONFIDENCE_BOUND']
+random_method = random_methods[2]
+
 for episode in range(max_episodes):
     print('EPISODE: {}     memory size: {}'.format(episode+1, len(memory)), end = '\t')
     # Initialize the game
@@ -62,17 +65,29 @@ for episode in range(max_episodes):
                     max_q = memory[index][1][i][0]
                     action = i
         else:
-            # # Force to pick the one least chosen
-            # min_n = 100
-            # action = 0
+            if random_method == 'RANDOM':
+                action = random.randint(0,8)
+            
+            elif random_method == 'LEAST_CHOSEN':
+                min_n = 100
+                action = 0
+                for i in range(9):
+                    if memory[index][1][i][1] <= min_n and memory[index][1][i][0] != -1:
+                        min_n = memory[index][1][i][1]
+                        action = i
+            
+            elif random_method == 'UPPER_CONFIDENCE_BOUND':
+                value = 0
+                action = 0
+                c = 2
 
-            # for i in range(9):
-            #     if memory[index][1][i][1] <= min_n and memory[index][1][i][0] != -1:
-            #         min_n = memory[index][1][i][1]
-            #         action = i
+                for i in range(9):
+                    new_value = memory[index][1][i][0] + c * np.sqrt(np.log(episode) / memory[index][1][i][1])
+                    if new_value >= value:
+                        value = new_value
+                        action = i
 
 
-            action = random.randint(0,8)
         
         memory[index][1][action][1] += 1
 
