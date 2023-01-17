@@ -52,7 +52,8 @@ class Game():
                 print('\n\n\n~~~~~ X wins! ~~~~~\n\n')
                 
         elif self.done == 2:          # draw
-            self.reward = 0.5
+            # self.reward = 0.5
+            self.reward = 0
             if self.debug:
                 print('\n\n\n~~~~~ draw! ~~~~~\n\n')
                 

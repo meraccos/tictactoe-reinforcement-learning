@@ -14,8 +14,6 @@ max_episodes = 5000000
 
 epsilon = 0.1
 
-gamma_memory = []
-win_memory = []
 memsize_memory = []
 
 win_rate = []
@@ -27,10 +25,12 @@ positive_rate = []
 random_methods = ['RANDOM', 'LEAST_CHOSEN', 'UPPER_CONFIDENCE_BOUND']
 random_method = random_methods[2]
 
-forced_exploration = True
 
-wins = 0
-nums = 0
+win = 0
+loss = 0
+draw = 0
+illegal = 0 
+nums = 1
 
 for episode in range(max_episodes):
     memory_size = len(memory[0])
@@ -85,7 +85,7 @@ for episode in range(max_episodes):
             elif random_method == 'UPPER_CONFIDENCE_BOUND':
                 value = 0
                 action = 0
-                c = 200
+                c = 4
 
                 for count, n in enumerate(memory[2][index]):
                     if n == 0:
@@ -126,28 +126,28 @@ for episode in range(max_episodes):
 
         # Update the Q value
         memory[1][index][action] = round(q_prev + (gamma_sum-q_prev) / n, 3)
-
-        if i == 0:
-            gamma_memory.append(gamma_sum)
     
     if player == 'ai':
         nums += 1
-        if reward in [0.5, 1]:
-            wins += 1
+        if reward == 0:
+            draw += 1
+        elif reward == 1:
+            win += 1
+        elif reward == -0.5:
+            loss += 1
+        elif reward == -1:
+            illegal += 1
 
     if episode % (max_episodes / 100) == 0:
 
-        if nums == 0:
-            nums = 1
-
-        print('{} / {} [{}{}]      memory: {} (%{})      acc: {}'.format(str(episode).rjust(len(str(max_episodes)) + 1), 
+        print('{} / {} [{}{}]      memory: {} (%{}) win: {}    loss: {}   draw: {}    illegal: {}'.format(str(episode).rjust(len(str(max_episodes)) + 1), 
                                     max_episodes, 
                                     '#'*int(20 * episode / max_episodes), 
                                     '-'*int(20 * (1-(episode+1) / max_episodes)),
                                     str(memory_size).ljust(4),
                                     round(100 * memory_size / 2423, 2),    # max: 2423
-                                    round(wins / nums, 3)))
-        nums = 0
+                                    round(win / nums, 3)), round(loss / nums, 3), round(draw / nums, 3), round(illegal / nums, 3))
+        nums = 1
         wins = 0
             
 
