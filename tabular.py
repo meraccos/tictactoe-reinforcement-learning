@@ -9,10 +9,10 @@ env = tictactoe.Game(debug=False)
 
 memory = [[],[],[]]             #[[state], [q values], [n values]]
 
-max_episodes = 500000
-eval_rate = 2000
+max_episodes = 5000000
 
-epsilon = 0.2
+
+epsilon = 0.1
 
 gamma_memory = []
 win_memory = []
@@ -27,9 +27,13 @@ positive_rate = []
 random_methods = ['RANDOM', 'LEAST_CHOSEN', 'UPPER_CONFIDENCE_BOUND']
 random_method = random_methods[2]
 
+forced_exploration = True
+
+wins = 0
+nums = 0
+
 for episode in range(max_episodes):
     memory_size = len(memory[0])
-    print('EPISODE: {}     memory size: {}'.format(episode+1, memory_size))
     memsize_memory.append(memory_size)
 
     # Initialize the game
@@ -39,6 +43,15 @@ for episode in range(max_episodes):
     index_memory = []
     action_memory = []
     reward_memory = []
+
+
+    if episode < 100000:
+        forced_exploration = True
+        epsilon = 0.9
+    else:
+        forced_exploration = False
+        epsilon = 0.2
+
         
     
     # Start playing
@@ -54,13 +67,16 @@ for episode in range(max_episodes):
             index = memory_size   
     
         # Get the action based on e-greedy algorithm
-        if random.random() > 0.1:
+        if random.random() > epsilon:
             player = 'ai'
             action = memory[1][index].index(max(memory[1][index]))
         
         else:
             player = 'random'
-            if random_method == 'RANDOM':
+            if forced_exploration:
+                action = memory[2][index].index(min(memory[2][index]))
+
+            elif random_method == 'RANDOM':
                 action = random.randint(0,8)
             
             elif random_method == 'LEAST_CHOSEN':
@@ -69,7 +85,7 @@ for episode in range(max_episodes):
             elif random_method == 'UPPER_CONFIDENCE_BOUND':
                 value = 0
                 action = 0
-                c = 1
+                c = 200
 
                 for count, n in enumerate(memory[2][index]):
                     if n == 0:
@@ -96,63 +112,7 @@ for episode in range(max_episodes):
         index_memory.append(index)
         action_memory.append(action)
         reward_memory.append(reward)
-        
-        
-        
-        
-    if episode % eval_rate == 0:
-        max_eval_episodes = 200
-        winner = []
-        for eval_episode in range(max_eval_episodes):
-
-            # Initialize the game
-            done = False
-            state = env.reset()
-            
-            # Start playing
-            while not done:
-                deep_state = copy.copy(state)
-
-                try:
-                    index = memory[0].index(deep_state)
-                except Exception as e:
-                    done = -1
-                    break
-                
-                action = memory[1][index].index(max(memory[1][index]))
-
-                # Take the game step
-                state, reward, done = env.step(action, label = 1)
-
-                # Take a random opponent move
-                if done == 0:    
-                    legal_moves = [i for i, value in enumerate(state) if value == 0]
-                    random_move = random.choice(legal_moves)
-                    state, reward, done = env.step(random_move, label = -1)
-                    
-            winner.append(done)
-            
-        win = 0
-        loss = 0
-        draw = 0
-        illegal = 0
-            
-        for i in winner:
-            if i == -1:
-                loss += 1
-            elif i == 2:
-                draw += 1
-            elif i == 1:
-                win += 1
-            elif i == -2:
-                illegal += 1
-                
-        win_rate.append(win / max_eval_episodes)
-        loss_rate.append(loss / max_eval_episodes)
-        draw_rate.append(draw / max_eval_episodes)
-        illegal_rate.append(illegal / max_eval_episodes)
-        positive_rate.append((win+draw)/max_eval_episodes)
-        
+    
         
     # Implement Q
     
@@ -169,7 +129,28 @@ for episode in range(max_episodes):
 
         if i == 0:
             gamma_memory.append(gamma_sum)
+    
+    if player == 'ai':
+        nums += 1
+        if reward in [0.5, 1]:
+            wins += 1
+
+    if episode % (max_episodes / 100) == 0:
+
+        if nums == 0:
+            nums = 1
+
+        print('{} / {} [{}{}]      memory: {} (%{})      acc: {}'.format(str(episode).rjust(len(str(max_episodes)) + 1), 
+                                    max_episodes, 
+                                    '#'*int(20 * episode / max_episodes), 
+                                    '-'*int(20 * (1-(episode+1) / max_episodes)),
+                                    str(memory_size).ljust(4),
+                                    round(100 * memory_size / 2423, 2),    # max: 2423
+                                    round(wins / nums, 3)))
+        nums = 0
+        wins = 0
             
+
 
 
 with open('memory.txt', 'wb') as file:

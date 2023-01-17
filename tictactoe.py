@@ -6,7 +6,6 @@ class Game():
         self.done = 0                   # 0 for not done, 1 for X wins, -1 for O wins, -2 for illegal move, 2 for draw
         self.debug = debug
         self.reset()
-        # self.board = [0,0,0,0,0,0,0,0,0]
         if self.debug:
             self._draw()
 
@@ -44,7 +43,8 @@ class Game():
 
     def _computeReward(self):
         if self.done == 0:            # game continues
-            self.reward = 0.1
+            # self.reward = 0.1
+            self.reward = -0.1
             
         elif self.done == 1:          # X wins
             self.reward = 1
