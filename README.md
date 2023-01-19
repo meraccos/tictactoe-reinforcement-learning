@@ -1,22 +1,17 @@
-# deep-q-learning
+# Tabular Reinforcement Learning applied on Tic Tac Toe
 
-Introduction to Making a Simple Game AI with Deep Reinforcement Learning
+Introduction to making a simple Tic Tac Toe AI with Reinforcement Learning.
+
+(Still under work, currently at ~99% success rate.
 
 
 
 ![animation](./assets/animation.gif)
 
-Minimal and Simple Deep Q Learning Implemenation in Keras and Gym. Under 100 lines of code!
+Minimal and Simple Tabular Reinforcement Learning application from scratch!
 
-The explanation for the `dqn.py` code is covered in the blog article
-[https://keon.io/deep-q-learning/](https://keon.io/deep-q-learning/)
+To start the training, run python3 tabular.py
 
+Memory is automatically saved in memory.txt. Example working memories are given in good_memory.txt and best_memory.txt 
 
-I made minor tweaks to this repository such as `load` and `save` functions for convenience.
-
-I also made the `memory` a deque instead of just a list.
-This is in order to limit the maximum number of elements in the memory.
-
-
-The training might be unstable for `dqn.py`. This problem is mitigated in `ddqn.py`.
-I'll cover `ddqn` in the next article.
+To play against the AI, run python3 human.py. You can specify the trained memory file.
