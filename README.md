@@ -1,14 +1,7 @@
 # Tabular Reinforcement Learning applied on Tic Tac Toe
 
-Introduction to making a simple Tic Tac Toe AI with Reinforcement Learning.
+This repository attempts to teach a tabular reinforcement learning agent to learn playing tic-tac-toe. The work is still under development, currently winning at ~98% success rate.
 
-(Still under work, currently at ~99% success rate)
-
-
-
-![animation](./assets/animation.gif)
-
-Minimal and Simple Tabular Reinforcement Learning application from scratch!
 
 To start the training, run python3 tabular.py
 
