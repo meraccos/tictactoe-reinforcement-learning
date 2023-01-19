@@ -7,7 +7,7 @@ env = tictactoe.Game(debug=True)
 state = env.reset()
 done = False
     
-with open('best_memory.txt', 'rb') as file:
+with open('/memory/best_memory.txt', 'rb') as file:
     memory = pickle.load(file)
 
 # print('debug: ', memory[0][0], memory[1][0], memory[2][0])

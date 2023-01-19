@@ -153,7 +153,7 @@ for episode in range(max_episodes):
 
 
 
-with open('memory.txt', 'wb') as file:
+with open('memory/memory.txt', 'wb') as file:
     pickle.dump(memory, file)
 
 
