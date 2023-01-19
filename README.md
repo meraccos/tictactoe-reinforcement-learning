@@ -2,7 +2,7 @@
 
 Introduction to making a simple Tic Tac Toe AI with Reinforcement Learning.
 
-(Still under work, currently at ~99% success rate.
+(Still under work, currently at ~99% success rate)
 
 
 
