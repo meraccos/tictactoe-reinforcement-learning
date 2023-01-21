@@ -1,10 +1,26 @@
 # Tabular Reinforcement Learning applied on Tic Tac Toe
 
-This repository attempts to teach a tabular reinforcement learning agent to learn playing tic-tac-toe. The work is still under development, currently winning at ~98% success rate.
+Applying valute iteration and MDP to to teach a reinforcement learning agent playing tic-tac-toe. 
+The code is written in Python from scratch, and the policy is near-optimal.
 
+The memory folder contains initialized and re-evaluated state-value pairs. (load using Pickle)
 
-To start the training, run python3 tabular.py
+Guidelines:
 
-Memory is automatically saved in memory.txt. Example working memories are given in good_memory.txt and best_memory.txt 
+Step 1. Extract all the possible states and initialize their values:
+python3 state_extractor.py
 
-To play against the AI, run python3 human.py. You can specify the trained memory file.
+Step 2. Run value iteration over all the states until convergence:
+python3 value_iterator.py
+
+Step 3. Several ways to check the policy
+
+I: AI plays against a randomly playing agent:
+python3 markov_eval.py
+
+II: AI plays against itself:
+python3 against_itself.py
+
+III: AI plays against human:
+python3 human.py
+
