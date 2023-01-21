@@ -1,3 +1,8 @@
+#######################################################################
+#
+# Tic-Tac-Toe game environment
+#
+#######################################################################
 import numpy as np
 
 
@@ -5,9 +10,7 @@ class Game():
     def __init__(self, debug=False):  
         self.done = 0                   # 0 for not done, 1 for X wins, -1 for O wins, -2 for illegal move, 2 for draw
         self.debug = debug
-        self.reset()
-        if self.debug:
-            self._draw()
+
 
     def _draw(self):
         sign_board = list(' ' * (self.board[i] == 0) +
@@ -85,4 +88,6 @@ class Game():
 
     def reset(self):
         self.board = [0,0,0,0,0,0,0,0,0]
+        if self.debug:
+            self._draw()
         return self.board

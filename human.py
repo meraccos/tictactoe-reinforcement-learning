@@ -1,71 +1,111 @@
+#######################################################################
+#
+# A simple human-AI game interface (needs to be improved :))
+#
+#######################################################################
+
 import tictactoe
-import numpy as np
-import pickle
 import random
+import pickle
+from utils import *
+import time
+
+
+print('\n\nWelcome to the game!')
+print('Good luck!')
+time.sleep(1)
+print('You will need it :)\n')
+time.sleep(1)
+
 
 env = tictactoe.Game(debug=True)
-state = env.reset()
-done = False
+
+
+with open('./memory/state_action.txt', 'rb') as file:
+    state_action = pickle.load(file)
     
-with open('/memory/best_memory.txt', 'rb') as file:
-    memory = pickle.load(file)
+states = state_action[0]
+x_values = state_action[1]
+o_values = state_action[2]
 
-# print('debug: ', memory[0][0], memory[1][0], memory[2][0])
+score_table = [0, 0]    # human, AI
 
-first_move = True
+while True:
 
-while not done:
-    index = -1
+    # Initialize the game
+    human_player = int(input('\nPlease select the game mode:\n\t -1. Play as O \n\t 1. Play as X\n'))
     
-    # Get the index of the state in the memory
-    for count, value in enumerate(memory[0]):
-        if value == state:
-            index = count
-            break
+    if human_player == -1:
+        ai_label = 1
+        human_label = -1
+    else:
+        ai_label = -1
+        human_label = 1
+    
+    init = True
+    
+    done = False
+    state = env.reset()
+    
+    # Start playing
+    while not done:   
+        if (init and human_player == 1):     
+            init = False
+            random_move = int(input('Please make a move: ')) - 1
+            state, reward, done = env.step(random_move, label = human_label)
+            continue
+
+        legal_moves = [i for i, value in enumerate(state) if value == 0]
+        legal_values = []
+        
+        for action in legal_moves:
+            outcome_indices = possible_outcome_indices(states, state, action)
             
-    if index == -1:
-        print('state does not exist in the memory')
+            p = 1 / len(outcome_indices)
+            action_value = 0
+            
+            for i in outcome_indices:
+                if human_player == -1:
+                    value = x_values[i]
+                else:
+                    value = o_values[i]
+                action_value += p * value          
+            
+            legal_values.append(round(action_value, 3)) 
+        print('legal moves', legal_moves)
+        print('legal values', legal_values)
 
-    if first_move:
-        good_qs = []
-        for count, value in enumerate(memory[1][index]):
-            if value >= 0.3:
-                good_qs.append(count)
+        action = legal_moves[legal_values.index(max(legal_values))]
+        print('actiooon', action)
         
-        action = random.choice(good_qs)
-        first_move = False
-    
-    else:
-        max_q = 0
-        for count, value in enumerate(memory[1][index]):
-            if value >= max_q:
-                max_q = value
-                action = count
 
-
-    state, reward, done = env.step(action, label = 1)
-
-    if done == 0:
-        done = -2
-        while done == -2:
-            action = int(input('Please make the move: (O)\t'))
-            state, reward, done = env.step(action-1, label = -1)
-    else:
-        print('\n\n')
-    
-    
-    
-    
-    
-    # def _opponentMove(self):
-    #     legal_moves = np.where(self.board == 0)[0]
-    #     if self.opponent == 'random':
-    #         action = random.choice(legal_moves)
         
-    #     elif self.opponent == 'human':
-    #         action = -1
-    #         while action not in legal_moves:
-    #             action = int(input('Please make the move: (O)\t')) - 1 
-        
-    #     return action
+        ######## Take the game step based on picked action #######
+        print('\nSmartPuter is Thinking....')
+        time.sleep(1)
+        if init:
+            action = random.choice([0,2,4,6,8])
+            init = False
+        state, reward, done = env.step(action, ai_label)
+
+        # Human moves
+        if done == 0:    
+            init = False
+                  
+            random_move = int(input('Please make a move: ')) - 1
+            state, reward, done = env.step(random_move, label = human_label)
+                    
+            
+    if done == human_player :
+        score_table[0] += 1
+    elif done in [-1, 1]:
+        score_table[1] += 1
+
+    print("\n\nGame Over!")
+    time.sleep(1)
+    print('AI: ', score_table[1])
+    time.sleep(1)
+    print('Human: ', score_table[0], '\n\n')
+    time.sleep(2)
+    
 

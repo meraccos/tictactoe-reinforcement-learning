@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 def check_done(state):
     # Checks if the state is terminal (done) and 
@@ -26,4 +27,33 @@ def check_done(state):
     
     return done
 
-[1, -1, 1, -1, 1, -1, -1, 1, 0]
+
+def possible_outcome_indices(states, state, action):
+    next_state = copy.copy(state)
+    player = (sum(state) == 0)
+    if player:
+        next_state[action] = 1
+    else:
+        next_state[action] = -1
+    
+    indices = []
+    
+    done = check_done(next_state)
+
+    if done == 0:
+        legal_opponent_moves = [i for i, value in enumerate(next_state) if value == 0]
+        
+        
+        for move in legal_opponent_moves:
+            possible_state = copy.copy(next_state)
+            
+            if player:
+                possible_state[move] = -1
+            else:
+                possible_state[move] = 1
+            indices.append(states.index(possible_state))
+        
+    else:
+        indices.append(states.index(next_state))
+    
+    return indices
