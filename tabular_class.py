@@ -7,7 +7,7 @@ import copy
 
 env = tictactoe.Game(debug=False)
 
-memory = [[[0,0,0,0,0,0,0,0,0]],[0]]             #[[state], [state value]]
+memory = [[],[]]             #[[state], [state value]]
 memory_size_log = []
 max_episodes = 5000000
 
@@ -22,6 +22,16 @@ draw = 0
 illegal = 0 
 nums = 1
 
+def memory_handler(self, state):
+    try:
+        self.index = self.memory[0].index(state)
+    except:
+        self.memory[0].append(state)
+        self.memory[1].append([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.memory[2].append([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.index = self.memory_size - 1
+        
+    return index         
     
 
 for episode in range(max_episodes):
@@ -34,7 +44,7 @@ for episode in range(max_episodes):
     
     index_memory = []
     action_memory = []
-    # reward_memory = []
+    reward_memory = []
 
 
     if episode < 100000:
@@ -47,15 +57,50 @@ for episode in range(max_episodes):
     
     # Start playing
     while not done:        
+        deep_state = copy.copy(state)
 
+        # try:
+        #     index = memory[0].index(deep_state)
+        # except Exception as e:
+        #     memory[0].append(deep_state)
+        #     memory[1].append([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        #     memory[2].append([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        #     index = memory_size - 1 
     
-        ##########################################################
-        # Get the action based on e-greedy action-value algorithm
-        ##########################################################
+        # Get the action based on e-greedy algorithm
+        if random.random() > epsilon:
+            player = 'ai'
+            action = memory[1][index].index(max(memory[1][index]))
         
+        else:
+            player = 'random'
+            if forced_exploration:
+                action = memory[2][index].index(min(memory[2][index]))
 
+            elif random_method == 'RANDOM':
+                action = random.randint(0,8)
+            
+            elif random_method == 'LEAST_CHOSEN':
+                action = memory[2][index].index(min(memory[1][index]))
+            
+            elif random_method == 'UPPER_CONFIDENCE_BOUND':
+                value = 0
+                action = 0
+                c = 4
+
+                for count, n in enumerate(memory[2][index]):
+                    if n == 0:
+                        action = count
+                        break
+
+                    new_value = memory[1][index][count] + c * np.sqrt(np.log(episode) / n)
+                    if new_value >= value:
+                        value = new_value
+                        action = count
         
-        ######## Take the game step based on picked action #######
+        memory[2][index][action] += 1
+        
+        # Take the game step
         state, reward, done = env.step(action, label = 1)
 
         # Take a random opponent move
@@ -64,21 +109,10 @@ for episode in range(max_episodes):
             random_move = random.choice(legal_moves)
             state, reward, done = env.step(random_move, label = -1)
         
-        
-        ######## Log the memory ###################################
-        deep_state = copy.copy(state)
-        
-        try:
-            index = memory[0].index(deep_state)
-        except Exception as e:
-            memory[0].append(deep_state)
-            memory[1].append(0)
-            index = memory_size - 1 
-            
-            
-        ######## Log the episode memories #########################
+        # Log the memories
         index_memory.append(index)
         action_memory.append(action)
+        reward_memory.append(reward)
     
         
     # Value Iteration
