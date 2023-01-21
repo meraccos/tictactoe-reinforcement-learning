@@ -11,7 +11,10 @@ Step 1. Extract all the possible states and initialize their values:
 python3 state_extractor.py
 
 Step 2. Run value iteration over all the states until convergence:
+
+'''
 python3 value_iterator.py
+'''
 
 Step 3. Several ways to check the policy
 
